@@ -186,7 +186,26 @@ function handle_special_geometry(geom) {
     if (geom.type == "_meshfile") {
         if (geom.format == "obj") {
             let loader = new THREE.OBJLoader2();
-            let obj = loader.parse(geom.data + "\n");
+            let obj;
+
+            if (geom.data != null) {
+                obj = loader.parse(geom.data + "\n");
+            } else if (geom.url != null) {
+                console.log("Load from URL");
+
+                var reader = new FileReader();
+                reader.onloadend = function(evt) {
+                    console.log("hey")
+                    // file is loaded
+                    result = evt.target.result;
+
+                    ready = true;
+
+                    console.log("Result", result)
+                };
+                reader.readAsArrayBuffer(new File([],geom.url));
+            }
+
             let loaded_geom = obj.children[0].geometry;
             loaded_geom.uuid = geom.uuid;
             let json = loaded_geom.toJSON();
